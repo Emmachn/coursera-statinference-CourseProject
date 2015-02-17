@@ -1,0 +1,35 @@
+---
+title: "Statistical Inference Course Project - statinference-011"
+author: "Esmit Pérez"
+date: "February 16, 2015"
+output: html_document
+---
+
+#Overview
+
+This is the report for the project for the statistical inference class. In it, I will use simulation to explore inference and do some simple inferential data analysis. The project consists of two parts:
+
+1. A simulation exercise.
+2. Basic inferential data analysis.
+
+The format and formulas here included are based off the [outline of the project](https://class.coursera.org/statinference-011/human_grading/view/courses/973519/assessments/4/submissions).
+
+#Simulations
+
+```{r}
+lambda <- 0.2
+miu <- 1/lambda
+stdDev <- 1/lambda
+numExponentials <- 40
+numSimulations <- 1000
+
+```
+
+
+#Sample Mean versus Theoretical Mean
+
+
+#Sample Variance versus Theoretical Variance
+
+
+#Distribution

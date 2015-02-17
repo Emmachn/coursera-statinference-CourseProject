@@ -5,7 +5,8 @@ date: "February 16, 2015"
 output: html_document
 ---
 
-#Overview
+#Part 1
+##Overview
 
 This is the report for the project for the statistical inference class. In it, I will use simulation to explore inference and do some simple inferential data analysis. The project consists of two parts:
 
@@ -14,22 +15,80 @@ This is the report for the project for the statistical inference class. In it, I
 
 The format and formulas here included are based off the [outline of the project](https://class.coursera.org/statinference-011/human_grading/view/courses/973519/assessments/4/submissions).
 
-#Simulations
+##Simulations
 
 ```{r}
+library(ggplot2)
 lambda <- 0.2
 miu <- 1/lambda
 stdDev <- 1/lambda
 numExponentials <- 40
-numSimulations <- 1000
+numSimulations <- 1:1000
+
+# we're dealing with random data, so always set seed to make it reproducible.
+set.seed(909)
+
+# obtains the mean of running rexp with 40 exponentials and given lambda
+cfunc <- function(v) {mean(rexp(numExponentials, lambda))}
+
+#  for each entry in array of size 1000, run the function
+mns = NULL
+for (i in 1 : 1000) mns = c(mns, mean(cfunc()))
+
+dat <- data.frame(x = mns)
 
 ```
 
 
-#Sample Mean versus Theoretical Mean
+##Sample Mean versus Theoretical Mean
 
+Theoretical mean is 1/lambda:
+```{r}
+miu
+```
 
-#Sample Variance versus Theoretical Variance
+The sample mean is:
+```{r}
+mean(dat$x)
+```
 
+##Sample Variance versus Theoretical Variance
 
-#Distribution
+Theoretical variance is miu/sqrt(n):
+```{r}
+miu/sqrt(numExponentials)
+```
+
+The sample variance is:
+```{r}
+var(dat$x)
+```
+
+##Distribution
+
+The accompanying graph shows...
+
+```{r}
+g <- ggplot(dat, aes(x = x)) + geom_histogram(binwidth=.3, colour = "black", fill="white", aes(y = ..density..)) 
+g <- g + stat_function(fun = dnorm, arg=list( mean= miu, sd=sd(dat$x) ), color="red", size=1)
+
+g
+```
+
+#Part 2
+Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
+Load the ToothGrowth data and perform some basic exploratory data analyses 
+```{r}
+data(ToothGrowth)
+```
+
+Provide a basic summary of the data.
+```{r}
+str(ToothGrowth)
+summary(ToothGrowth)
+head(ToothGrowth)
+```
+
+Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+State your conclusions and the assumptions needed for your conclusions. 

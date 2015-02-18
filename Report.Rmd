@@ -1,9 +1,15 @@
 ---
-title: "Statistical Inference Course Project - statinference-011"
+title: "Statistical Inference (statinference-011) Course Project"
 author: "Esmit Pérez"
 date: "February 16, 2015"
-output: html_document
+output: pdf_document
 ---
+
+```{r setoptions, echo = FALSE}
+library(knitr)
+# always echo.
+opts_chunk$set(echo = TRUE, fig.width = 12, fig.height = 5)
+```
 
 #Part 1
 ##Overview
@@ -17,10 +23,13 @@ The format and formulas here included are based off the [outline of the project]
 
 ##Simulations
 
-```{r}
+The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. Set lambda = 0.2 for all of the simulations. You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.
+
+```{r prepare-data-frame}
+# load libraries, setup variables
 library(ggplot2)
 lambda <- 0.2
-miu <- 1/lambda
+mu <- 1/lambda
 stdDev <- 1/lambda
 numExponentials <- 40
 numSimulations <- 1:1000
@@ -43,52 +52,107 @@ dat <- data.frame(x = mns)
 ##Sample Mean versus Theoretical Mean
 
 Theoretical mean is 1/lambda:
-```{r}
-miu
+```{r theoretical-mean}
+mu
 ```
 
 The sample mean is:
-```{r}
+```{r sample-mean}
 mean(dat$x)
 ```
 
 ##Sample Variance versus Theoretical Variance
 
-Theoretical variance is miu/sqrt(n):
-```{r}
-miu/sqrt(numExponentials)
+Theoretical variance is $\mu/\sqrt(n)$:
+```{r theoretical-variance}
+mu/sqrt(numExponentials)
 ```
 
-The sample variance is:
-```{r}
+The sample variance _S_ is:
+```{r sample-variance}
 var(dat$x)
 ```
 
 ##Distribution
 
-The accompanying graph shows...
+The following graph shows how the mean values of 1000 simulations approximate the normal distribution (curve in red).
 
-```{r}
-g <- ggplot(dat, aes(x = x)) + geom_histogram(binwidth=.3, colour = "black", fill="white", aes(y = ..density..)) 
-g <- g + stat_function(fun = dnorm, arg=list( mean= miu, sd=sd(dat$x) ), color="red", size=1)
+```{r distribution-plot}
+# plot and customize graph
+g <- ggplot(dat, aes(x = x)) 
+g <- g + geom_histogram(binwidth=.3, colour = "black", fill="white", 
+        aes(y = ..density..)) 
+g <- g + ggtitle("Means of 1000 simulations of rexp(40,0.02)") 
+g <- g + xlab("Means") + ylab("Density")
+
+g <- g + stat_function(fun = dnorm, arg=list( mean= mu, sd=sd(dat$x) ), 
+        color="red", size=1)
+g <- g + theme_bw()
 
 g
 ```
 
 #Part 2
 Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
-Load the ToothGrowth data and perform some basic exploratory data analyses 
-```{r}
+
+Load the ToothGrowth data and perform some basic exploratory data analyses.
+
+```{r load-tooth-growth}
+#load data set from R's provided datasets
 data(ToothGrowth)
 ```
 
-Provide a basic summary of the data.
-```{r}
+
+###Provide a basic summary of the data. 
+
+_Note_: Please refer to appendix for a complete summary.
+
+The following plot shows the growth length, per supplement at varying dosages:
+```{r, tooth-growth-boxplot}
+#plot and customize graph
+g <- ggplot(ToothGrowth,aes(x = dose, y = len, color=supp))
+g <- g + ggtitle("The Effect of Vitamin C on Tooth Growth in Guinea Pigs") 
+g <- g + xlab("Dose level (in mg)") + ylab("Length")
+g <- g + scale_color_discrete(name="Delivery Method (Supplement)",
+                         breaks=c("OJ", "VC"),
+                         labels=c("Orange Juice", "Ascorbic Acide"))
+g <- g + geom_boxplot()
+g <- g + facet_grid(. ~ dose , labeller = function(variable, value){ paste0(value," mg") })
+g
+```
+
+###Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+$H_{0}$ : Supplement _OJ (Orange Juice)_ leads to more growth. $\mu$ = 3
+
+###State your conclusions and the assumptions needed for your conclusions. 
+
+
+\newpage
+
+#Appendix
+
+## Supporting figures and exploratory analysis for Part 2, ToothGrowth data.
+
+##Description
+
+"The Effect of Vitamin C on Tooth Growth in Guinea Pigs"
+
+The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
+
+##Summary information for `ToothGrowth`:
+```{r tooth-growth-summary}
 str(ToothGrowth)
 summary(ToothGrowth)
 head(ToothGrowth)
 ```
 
-Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+\newpage
 
-State your conclusions and the assumptions needed for your conclusions. 
+##Example `coplot` as per `help(ToothGrowth)`:
+
+```{r tooth-growth-coplot}
+require(graphics)
+coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
+       xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```

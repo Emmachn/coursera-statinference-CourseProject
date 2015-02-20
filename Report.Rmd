@@ -75,9 +75,9 @@ var(dat$x)
 
 ##Distribution
 
-The following graph shows how the mean values of 1000 simulations approximate the normal distribution (curve in red).
+The following graph shows how the mean values of 1000 simulations approximate the normal distribution (curve in red). For complete code and output see appendix, fig 1.1
 
-```{r distribution-plot}
+```{r distribution-plot, echo=FALSE}
 # plot and customize graph
 g <- ggplot(dat, aes(x = x)) 
 g <- g + geom_histogram(binwidth=.3, colour = "black", fill="white", 
@@ -107,8 +107,8 @@ data(ToothGrowth)
 
 _Note_: Please refer to appendix for a complete summary.
 
-The following plot shows the growth length, per supplement at varying dosages:
-```{r, tooth-growth-boxplot}
+The following plot shows the growth length, per supplement at varying dosages (see R code and graph in appendix, fig 2.1):
+```{r, tooth-growth-boxplot, echo=FALSE}
 #plot and customize graph
 g <- ggplot(ToothGrowth,aes(x = dose, y = len, color=supp))
 g <- g + ggtitle("The Effect of Vitamin C on Tooth Growth in Guinea Pigs") 
@@ -123,16 +123,47 @@ g
 
 ###Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
 
-$H_{0}$ : Supplement _OJ (Orange Juice)_ leads to more growth. $\mu$ = 3
+$H_{0}$ : Supplement _OJ (Orange Juice)_ leads to more growth.
+
 
 ###State your conclusions and the assumptions needed for your conclusions. 
+
+Based on (Week 3 video) (https://class.coursera.org/statinference-011/lecture/243) we can perform a `t.test` to determine whether this is true, assuming variances are equal (see complete output in appendix, fig 2.2):
+
+```{r ttestequal, echo=FALSE}
+# Assume variances ARE equal
+rbind(t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf,
+      t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf
+      )
+```
+
+Factors in `supp` show `OJ` comes first (see appendix, fig 2.3) and in both tests the result, is the same, column `1`, correspoding to `OJ` (_Orange Juice_) is below zero, meaning it does not lead to more length.
 
 
 \newpage
 
 #Appendix
 
-## Supporting figures and exploratory analysis for Part 2, ToothGrowth data.
+## Part 1 - Supporting figures.
+
+###Figure 1.1
+
+```{r distribution-plot-app}
+# plot and customize graph
+g <- ggplot(dat, aes(x = x)) 
+g <- g + geom_histogram(binwidth=.3, colour = "black", fill="white", 
+        aes(y = ..density..)) 
+g <- g + ggtitle("Means of 1000 simulations of rexp(40,0.02)") 
+g <- g + xlab("Means") + ylab("Density")
+
+g <- g + stat_function(fun = dnorm, arg=list( mean= mu, sd=sd(dat$x) ), 
+        color="red", size=1)
+g <- g + theme_bw()
+
+g
+```
+
+## Part 2 - Supporting figures and exploratory analysis, ToothGrowth data.
 
 ##Description
 
@@ -147,12 +178,38 @@ summary(ToothGrowth)
 head(ToothGrowth)
 ```
 
-\newpage
-
 ##Example `coplot` as per `help(ToothGrowth)`:
 
 ```{r tooth-growth-coplot}
 require(graphics)
 coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
        xlab = "ToothGrowth data: length vs dose, given type of supplement")
+```
+
+
+### Figure 2.1
+```{r, tooth-growth-boxplot-app}
+#plot and customize graph
+g <- ggplot(ToothGrowth,aes(x = dose, y = len, color=supp))
+g <- g + ggtitle("The Effect of Vitamin C on Tooth Growth in Guinea Pigs") 
+g <- g + xlab("Dose level (in mg)") + ylab("Length")
+g <- g + scale_color_discrete(name="Delivery Method (Supplement)",
+                         breaks=c("OJ", "VC"),
+                         labels=c("Orange Juice", "Ascorbic Acide"))
+g <- g + geom_boxplot()
+g <- g + facet_grid(. ~ dose , labeller = function(variable, value){ paste0(value," mg") })
+g
+```
+
+###Figure 2.2
+```{r ttestequal-app}
+# Assume variances ARE equal
+rbind(t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf,
+      t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf
+      )
+```
+
+####Figure 2.3
+```{r factorsofsupp-app}
+factor(ToothGrowth$supp)
 ```

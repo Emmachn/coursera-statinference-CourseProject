@@ -1,5 +1,5 @@
 ---
-title: "Statistical Inference (statinference-011) Course Project"
+title: "Statistical Inference (statinference-011) Course Project - Part 1"
 author: "Esmit Pérez"
 date: "February 16, 2015"
 output: pdf_document
@@ -92,53 +92,6 @@ g <- g + theme_bw()
 g
 ```
 
-#Part 2
-Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package. 
-
-Load the ToothGrowth data and perform some basic exploratory data analyses.
-
-```{r load-tooth-growth}
-#load data set from R's provided datasets
-data(ToothGrowth)
-```
-
-
-###Provide a basic summary of the data. 
-
-_Note_: Please refer to appendix for a complete summary.
-
-The following plot shows the growth length, per supplement at varying dosages (see R code and graph in appendix, fig 2.1):
-```{r, tooth-growth-boxplot, echo=FALSE}
-#plot and customize graph
-g <- ggplot(ToothGrowth,aes(x = dose, y = len, color=supp))
-g <- g + ggtitle("The Effect of Vitamin C on Tooth Growth in Guinea Pigs") 
-g <- g + xlab("Dose level (in mg)") + ylab("Length")
-g <- g + scale_color_discrete(name="Delivery Method (Supplement)",
-                         breaks=c("OJ", "VC"),
-                         labels=c("Orange Juice", "Ascorbic Acide"))
-g <- g + geom_boxplot()
-g <- g + facet_grid(. ~ dose , labeller = function(variable, value){ paste0(value," mg") })
-g
-```
-
-###Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
-
-$H_{0}$ : Supplement _OJ (Orange Juice)_ leads to more growth.
-
-
-###State your conclusions and the assumptions needed for your conclusions. 
-
-Based on (Week 3 video) (https://class.coursera.org/statinference-011/lecture/243) we can perform a `t.test` to determine whether this is true, assuming variances are equal (see complete output in appendix, fig 2.2):
-
-```{r ttestequal, echo=FALSE}
-# Assume variances ARE equal
-rbind(t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf,
-      t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf
-      )
-```
-
-Factors in `supp` show `OJ` comes first (see appendix, fig 2.3) and in both tests the result, is the same, column `1`, correspoding to `OJ` (_Orange Juice_) is below zero, meaning it does not lead to more length.
-
 
 \newpage
 
@@ -161,55 +114,4 @@ g <- g + stat_function(fun = dnorm, arg=list( mean= mu, sd=sd(dat$x) ),
 g <- g + theme_bw()
 
 g
-```
-
-## Part 2 - Supporting figures and exploratory analysis, ToothGrowth data.
-
-##Description
-
-"The Effect of Vitamin C on Tooth Growth in Guinea Pigs"
-
-The response is the length of odontoblasts (teeth) in each of 10 guinea pigs at each of three dose levels of Vitamin C (0.5, 1, and 2 mg) with each of two delivery methods (orange juice or ascorbic acid).
-
-##Summary information for `ToothGrowth`:
-```{r tooth-growth-summary}
-str(ToothGrowth)
-summary(ToothGrowth)
-head(ToothGrowth)
-```
-
-##Example `coplot` as per `help(ToothGrowth)`:
-
-```{r tooth-growth-coplot}
-require(graphics)
-coplot(len ~ dose | supp, data = ToothGrowth, panel = panel.smooth,
-       xlab = "ToothGrowth data: length vs dose, given type of supplement")
-```
-
-
-### Figure 2.1
-```{r, tooth-growth-boxplot-app}
-#plot and customize graph
-g <- ggplot(ToothGrowth,aes(x = dose, y = len, color=supp))
-g <- g + ggtitle("The Effect of Vitamin C on Tooth Growth in Guinea Pigs") 
-g <- g + xlab("Dose level (in mg)") + ylab("Length")
-g <- g + scale_color_discrete(name="Delivery Method (Supplement)",
-                         breaks=c("OJ", "VC"),
-                         labels=c("Orange Juice", "Ascorbic Acide"))
-g <- g + geom_boxplot()
-g <- g + facet_grid(. ~ dose , labeller = function(variable, value){ paste0(value," mg") })
-g
-```
-
-###Figure 2.2
-```{r ttestequal-app}
-# Assume variances ARE equal
-rbind(t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf,
-      t.test(len ~ supp, paired=FALSE, var.equal=T, data=ToothGrowth)$conf
-      )
-```
-
-####Figure 2.3
-```{r factorsofsupp-app}
-factor(ToothGrowth$supp)
 ```
